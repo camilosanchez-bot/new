@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Reporte de Visita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root {
+    --green: #1D9E75; --green-light: #E1F5EE; --green-mid: #9FE1CB; --green-dark: #0F6E56;
+    --bg: #F7F7F5; --surface: #FFFFFF; --border: rgba(0,0,0,0.10); --border-mid: rgba(0,0,0,0.18);
+    --text: #1A1A18; --text-muted: #6B6B66; --text-faint: #A0A09A;
+    --radius: 10px; --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 2rem; }
+  .app-header { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 1rem 1.25rem 0.8rem; position: sticky; top: 0; z-index: 10; }
+  .app-header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .app-header p { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 10px; }
+  .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.4s ease; }
+  .step-chips { display: flex; gap: 5px; margin-top: 10px; overflow-x: auto; padding-bottom: 2px; }
+  .step-chips::-webkit-scrollbar { display: none; }
+  .chip { flex-shrink: 0; font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 0.5px solid var(--border); color: var(--text-faint); background: var(--bg); white-space: nowrap; }
+  .chip.done { background: var(--green-light); color: var(--green-dark); border-color: var(--green-mid); }
+  .chip.active { background: var(--green); color: #fff; border-color: var(--green); font-weight: 500; }
+  .content { padding: 1.25rem; max-width: 480px; margin: 0 auto; }
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .section-label { font-size: 11px; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
+  .section-label i { font-size: 15px; }
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.1rem; margin-bottom: 1rem; }
+  .card-title { font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 5px; }
+  .field { margin-bottom: 0.85rem; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+  .field input, .field textarea, .field select {
+    width: 100%; padding: 9px 11px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+    border: 0.5px solid var(--border-mid); border-radius: var(--radius);
+    background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s;
+    -webkit-appearance: none; appearance: none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--green); background: #fff; }
+  .field textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+  .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B6B66' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+  .r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .r3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  hr { border: none; border-top: 0.5px solid var(--border); margin: 1rem 0; }
+  .sub-label { font-size: 11px; font-weight: 600; color: var(--green); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .inner-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px; margin-bottom: 8px; }
+  .inner-card-title { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+  .add-btn { width: 100%; padding: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: transparent; border: 0.5px dashed var(--green-mid); border-radius: var(--radius); color: var(--green); cursor: pointer; margin-bottom: 0; display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .add-btn:active { background: var(--green-light); }
+  .nav { display: flex; gap: 10px; margin-top: 1.5rem; }
+  .btn-back { flex: 1; padding: 11px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: var(--surface); border: 0.5px solid var(--border-mid); border-radius: var(--radius); color: var(--text-muted); cursor: pointer; font-weight: 500; }
+  .btn-next { flex: 2; padding: 11px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: var(--green); border: none; border-radius: var(--radius); color: #fff; cursor: pointer; font-weight: 600; letter-spacing: -0.2px; }
+  .btn-next:active { background: var(--green-dark); }
+  .tower-tabs { display: flex; gap: 6px; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 2px; }
+  .tower-tabs::-webkit-scrollbar { display: none; }
+  .t-tab { flex-shrink: 0; padding: 5px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; font-weight: 500; }
+  .t-tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+  .tower-block { display: none; }
+  .tower-block.active { display: block; }
+  .output-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .output-toolbar { padding: 10px 14px; background: var(--green-light); border-bottom: 0.5px solid var(--green-mid); display: flex; align-items: center; justify-content: space-between; }
+  .output-toolbar span { font-size: 12px; font-weight: 600; color: var(--green-dark); }
+  .output-text { padding: 1rem; font-family: 'DM Mono', monospace; font-size: 12.5px; color: var(--text); white-space: pre-wrap; line-height: 1.75; max-height: 55vh; overflow-y: auto; }
+  .btn-copy { padding: 6px 14px; font-size: 12px; font-family: 'DM Sans', sans-serif; background: var(--green); border: none; border-radius: 20px; color: #fff; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .btn-copy:active { background: var(--green-dark); }
+  .btn-whatsapp { width: 100%; margin-top: 10px; padding: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: #25D366; border: none; border-radius: var(--radius); color: #fff; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-new { width: 100%; margin-top: 8px; padding: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: var(--surface); border: 0.5px solid var(--border-mid); border-radius: var(--radius); color: var(--text-muted); cursor: pointer; font-weight: 500; }
+  .diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .diag-pill { padding: 12px 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; border: 0.5px solid var(--border-mid); border-radius: var(--radius); background: var(--bg); color: var(--text-muted); cursor: pointer; text-align: center; font-weight: 500; transition: all 0.15s; }
+  .diag-pill.selected.viable { background: var(--green); color: #fff; border-color: var(--green); }
+  .diag-pill.selected.no-viable { background: #E05252; color: #fff; border-color: #E05252; }
+  .diag-pill:active { opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>Reporte de visita</h1>
+  <p id="stepDesc">Información general del técnico</p>
+  <div class="progress-bar"><div class="progress-fill" id="prog" style="width:16.6%"></div></div>
+  <div class="step-chips" id="chips">
+    <div class="chip active" id="chip1">General</div>
+    <div class="chip" id="chip2">Sitio</div>
+    <div class="chip" id="chip3">Equipamiento</div>
+    <div class="chip" id="chip4">Energía</div>
+    <div class="chip" id="chip5">Zonas</div>
+    <div class="chip" id="chip6">Reporte</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- PASO 1: General -->
+  <div class="screen active" id="s1">
+    <div class="section-label"><i class="ti ti-user"></i> Información general</div>
+    <div class="card">
+      <div class="field"><label>Nombre del sitio</label><input type="text" id="nombre" placeholder="Ej: Torres del Parque" autocomplete="off"></div>
+      <div class="field"><label>Código</label><input type="text" id="codigo" placeholder="Ej: TEC-001"></div>
+      <div class="r2">
+        <div class="field"><label>Hora de ingreso</label><input type="time" id="horaIngreso"></div>
+        <div class="field"><label>Hora de salida</label><input type="time" id="horaSalida"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="r2">
+        <div class="field"><label>Torres visitadas</label><input type="number" id="torresVisitadas" min="1" placeholder="0" inputmode="numeric"></div>
+        <div class="field"><label>Homes Passed</label><input type="number" id="homesPassed" min="0" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="r2">
+        <div class="field"><label>Zonas com. visitadas</label><input type="text" id="zonasVisitadas" placeholder="Ej: Salón, Piscina..."></div>
+        <div class="field"><label>Zonas com. viables</label><input type="text" id="zonasViables" placeholder="Ej: Salón, Gimnasio..."></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-stethoscope"></i> Diagnóstico</div>
+      <div class="diag-grid">
+        <div class="diag-pill viable" onclick="selectDiag(this,'VIABLE','viable')">✅ Viable</div>
+        <div class="diag-pill no-viable" onclick="selectDiag(this,'NO VIABLE','no-viable')">❌ No viable</div>
+      </div>
+      <input type="hidden" id="diagnostico" value="">
+    </div>
+    <div class="nav"><button class="btn-next" onclick="goTo(2)">Siguiente →</button></div>
+  </div>
+
+  <!-- PASO 2: Descripción del sitio -->
+  <div class="screen" id="s2">
+    <div class="section-label"><i class="ti ti-building"></i> Descripción del sitio</div>
+    <div class="card">
+      <div class="field"><label>Tipo de despliegue proyectado</label><input type="text" id="despliegue" placeholder="Ej: FTTH, HFC..."></div>
+      <div class="field"><label>¿Cuántas torres tiene el sitio?</label>
+        <input type="number" id="cantTorres" min="1" max="10" placeholder="0" inputmode="numeric" oninput="setupTowers(this.value)">
+      </div>
+    </div>
+    <div id="torreBloques"></div>
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(1)">← Atrás</button>
+      <button class="btn-next" onclick="goTo(3)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 3: Equipamiento -->
+  <div class="screen" id="s3">
+    <div class="section-label"><i class="ti ti-tool"></i> Equipamiento por torre</div>
+    <div class="tower-tabs" id="tabsEquip"></div>
+    <div id="equipBlocks"></div>
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(2)">← Atrás</button>
+      <button class="btn-next" onclick="goTo(4)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 4: Energía -->
+  <div class="screen" id="s4">
+    <div class="section-label"><i class="ti ti-bolt"></i> Energía</div>
+    <div class="tower-tabs" id="tabsEnergia"></div>
+    <div id="energiaBlocks"></div>
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(3)">← Atrás</button>
+      <button class="btn-next" onclick="goTo(5)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 5: Zonas, notas, fibra -->
+  <div class="screen" id="s5">
+    <div class="section-label"><i class="ti ti-map-pin"></i> Sección general</div>
+    <div class="card">
+      <div class="field"><label>Notas / Observaciones generales</label><textarea id="notas" placeholder="Observaciones o novedades del sitio..."></textarea></div>
+    </div>
+    <div class="card">
+      <div class="field"><label>Descripción de zonas comunes</label><textarea id="zonasComunes" placeholder="Nombre de la zona, distancia del cableado, gabinete de piso del que se alimenta..."></textarea></div>
+    </div>
+    <div class="card">
+      <div class="field"><label>Ingreso de la fibra</label><textarea id="ingresoFibra" placeholder="Resumen del ingreso, tubería a instalar si aplica..."></textarea></div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(4)">← Atrás</button>
+      <button class="btn-next" onclick="goTo(6)">Generar reporte →</button>
+    </div>
+  </div>
+
+  <!-- PASO 6: Reporte -->
+  <div class="screen" id="s6">
+    <div class="section-label"><i class="ti ti-file-text"></i> Reporte generado</div>
+    <div class="output-wrap">
+      <div class="output-toolbar">
+        <span>Reporte listo</span>
+        <button class="btn-copy" id="btnCopy" onclick="copyReport()"><i class="ti ti-copy"></i> Copiar</button>
+      </div>
+      <div class="output-text" id="outputBox"></div>
+    </div>
+    <button class="btn-whatsapp" onclick="shareWhatsApp()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.999l6.304-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.002-1.368l-.359-.214-3.722.976.994-3.629-.234-.373A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/></svg>
+      Enviar por WhatsApp
+    </button>
+    <button class="btn-new" onclick="resetAll()">+ Nuevo reporte</button>
+  </div>
+
+</div>
+
+<script>
+let cur = 1;
+let numTorres = 0;
+let tramoCount = {};
+let cajaCount = {};
+let buitronCount = {};
+let diagVal = '';
+
+const stepDescs = ['','Información general del técnico','Descripción del sitio','Equipamiento por torre','Energía','Observaciones y zonas comunes','Reporte generado'];
+
+function goTo(n) {
+  document.getElementById('s'+cur).classList.remove('active');
+  const cc = document.getElementById('chip'+cur);
+  if(cc){ cc.classList.remove('active'); cc.classList.add('done'); }
+  cur = n;
+  document.getElementById('s'+n).classList.add('active');
+  document.getElementById('prog').style.width = (n/6*100)+'%';
+  document.getElementById('stepDesc').textContent = stepDescs[n];
+  for(let i=1;i<=6;i++){
+    const c=document.getElementById('chip'+i);
+    if(!c) continue;
+    c.classList.remove('active','done');
+    if(i<n) c.classList.add('done');
+    else if(i===n) c.classList.add('active');
+  }
+  if(n===6) buildReport();
+  window.scrollTo(0,0);
+}
+
+function selectDiag(el, val, cls) {
+  document.querySelectorAll('.diag-pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  diagVal = val;
+  document.getElementById('diagnostico').value = val;
+}
+
+function nd(id){ const e=document.getElementById(id); return (e&&e.value.trim())?e.value.trim():'N/D'; }
+
+function setupTowers(val){
+  numTorres = Math.min(parseInt(val)||0,10);
+  tramoCount={}; cajaCount={}; buitronCount={};
+  renderTorreDesc(); renderEquip(); renderEnergia();
+}
+
+function renderTorreDesc(){
+  const c=document.getElementById('torreBloques'); c.innerHTML='';
+  for(let i=1;i<=numTorres;i++){
+    const div=document.createElement('div'); div.className='card';
+    div.innerHTML=`
+      <div class="card-title"><i class="ti ti-building-skyscraper"></i> Torre ${i}</div>
+      <div class="field"><label>Piso de terraza</label><input type="number" id="t${i}_terraza" min="1" placeholder="0" inputmode="numeric"></div>
+      <div id="t${i}_tramos"></div>
+      <button class="add-btn" type="button" onclick="addTramo(${i})"><i class="ti ti-plus"></i> Agregar rango de pisos</button>
+      <hr>
+      <div class="r3">
+        <div class="field"><label>Buitrones</label><input type="number" id="t${i}_buitrones" min="0" placeholder="0" inputmode="numeric"></div>
+        <div class="field"><label>Locales</label><input type="number" id="t${i}_locales" min="0" placeholder="0" inputmode="numeric"></div>
+        <div class="field"><label>Sótanos</label><input type="number" id="t${i}_sotanos" min="0" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="field"><label>Total HHPP</label><input type="number" id="t${i}_hhpp" min="0" placeholder="0" inputmode="numeric"></div>`;
+    c.appendChild(div);
+    addTramo(i);
+  }
+}
+
+function addTramo(ti){
+  if(!tramoCount[ti]) tramoCount[ti]=0;
+  tramoCount[ti]++;
+  const idx=tramoCount[ti];
+  const c=document.getElementById('t'+ti+'_tramos');
+  const d=document.createElement('div'); d.className='inner-card';
+  d.innerHTML=`
+    <div class="inner-card-title">Rango de pisos ${idx}</div>
+    <div class="r2">
+      <div class="field"><label>Piso inicio</label><input type="number" id="t${ti}_r${idx}_ini" min="1" placeholder="0" inputmode="numeric"></div>
+      <div class="field"><label>Piso fin</label><input type="number" id="t${ti}_r${idx}_fin" min="1" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Apts por piso</label><input type="number" id="t${ti}_r${idx}_apts" min="1" placeholder="0" inputmode="numeric"></div>
+      <div class="field"><label>Interiores</label><input type="text" id="t${ti}_r${idx}_int" placeholder="Ej: 101,102"></div>
+    </div>`;
+  c.appendChild(d);
+}
+
+function renderEquip(){
+  const tabs=document.getElementById('tabsEquip'); const blocks=document.getElementById('equipBlocks');
+  tabs.innerHTML=''; blocks.innerHTML='';
+  for(let i=1;i<=numTorres;i++){
+    const tab=document.createElement('div');
+    tab.className='t-tab'+(i===1?' active':'');
+    tab.textContent='Torre '+i;
+    tab.onclick=()=>switchTab('Equip',i);
+    tabs.appendChild(tab);
+    const b=document.createElement('div');
+    b.className='tower-block'+(i===1?' active':'');
+    b.id='equipBlock'+i;
+    b.innerHTML=`
+      <div class="card">
+        <div class="sub-label">Cajas de equipos</div>
+        <div id="e${i}_cajas"></div>
+        <button class="add-btn" type="button" onclick="addCaja(${i})"><i class="ti ti-plus"></i> Agregar caja</button>
+      </div>
+      <div class="card">
+        <div class="sub-label">Buitrones</div>
+        <div id="e${i}_buitrones"></div>
+        <button class="add-btn" type="button" onclick="addBuitronEquip(${i})"><i class="ti ti-plus"></i> Agregar buitrón</button>
+      </div>
+      <div class="card">
+        <div class="sub-label">Gabinetes de piso</div>
+        <div class="r2">
+          <div class="field"><label>Gabinetes desde piso</label><input type="number" id="e${i}_gabDesde" min="0" placeholder="0" inputmode="numeric"></div>
+          <div class="field"><label>Hasta piso</label><input type="number" id="e${i}_gabHasta" min="0" placeholder="0" inputmode="numeric"></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Medidas de las cajas de piso</label><input type="text" id="e${i}_medCajas" placeholder="Ej: 40x30x15 cm"></div>
+          <div class="field"><label>Dist. entre cajas de piso</label><input type="text" id="e${i}_distCajas" placeholder="Ej: 3 mtrs"></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Ocupación del gabinete (%)</label><input type="number" id="e${i}_ocupGab" min="0" max="100" placeholder="0" inputmode="numeric"></div>
+          <div class="field"><label>Pisos sin espacio en gabinete</label><input type="text" id="e${i}_pisosSin" placeholder="Ej: 3, 5, 8"></div>
+        </div>
+      </div>`;
+    blocks.appendChild(b);
+    addCaja(i);
+    addBuitronEquip(i);
+  }
+}
+
+function addCaja(ti){
+  if(!cajaCount[ti]) cajaCount[ti]=0;
+  cajaCount[ti]++;
+  const idx=cajaCount[ti];
+  const c=document.getElementById('e'+ti+'_cajas');
+  const d=document.createElement('div'); d.className='inner-card';
+  d.innerHTML=`
+    <div class="inner-card-title">Caja ${idx}</div>
+    <div class="field"><label>Piso</label><input type="number" id="e${ti}_c${idx}_piso" min="0" placeholder="0" inputmode="numeric"></div>
+    <div class="field"><label>Tamaño de la caja de equipos</label><input type="text" id="e${ti}_c${idx}_tam" placeholder="Ej: 60x40x20 cm"></div>
+    <div class="field"><label>Ubicación exacta</label><input type="text" id="e${ti}_c${idx}_ubic" placeholder="Ej: cuarto de redes, pasillo..."></div>
+    <div class="r3">
+      <div class="field"><label>Dist. buitrón (m)</label><input type="number" id="e${ti}_c${idx}_distBuitron" min="0" placeholder="0" inputmode="numeric"></div>
+      <div class="field"><label>Piso buitrón</label><input type="number" id="e${ti}_c${idx}_pisoBuitron" min="0" placeholder="0" inputmode="numeric"></div>
+      <div class="field"><label>Dist. gabinete (m)</label><input type="number" id="e${ti}_c${idx}_distGab" min="0" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Piso inicio apts.</label><input type="number" id="e${ti}_c${idx}_pisoIniApts" min="0" placeholder="0" inputmode="numeric"></div>
+      <div class="field"><label>Tubería galv. (m)</label><input type="text" id="e${ti}_c${idx}_tuberia" placeholder="0"></div>
+    </div>`;
+  c.appendChild(d);
+}
+
+function renderEnergia(){
+  const tabs=document.getElementById('tabsEnergia'); const blocks=document.getElementById('energiaBlocks');
+  tabs.innerHTML=''; blocks.innerHTML='';
+  for(let i=1;i<=numTorres;i++){
+    const tab=document.createElement('div');
+    tab.className='t-tab'+(i===1?' active':'');
+    tab.textContent='Torre '+i;
+    tab.onclick=()=>switchTab('Energia',i);
+    tabs.appendChild(tab);
+    const b=document.createElement('div');
+    b.className='tower-block'+(i===1?' active':'');
+    b.id='energiaBlock'+i;
+    b.innerHTML=`
+      <div class="card">
+        <div class="r2">
+          <div class="field"><label>Piso de la energía</label><input type="number" id="n${i}_pisoEn" min="0" placeholder="0" inputmode="numeric"></div>
+          <div class="field"><label>Ubicación</label><input type="text" id="n${i}_ubicEn" placeholder="Ej: cuarto eléctrico"></div>
+        </div>
+        <div class="r2">
+          <div class="field"><label>Fuente de energía</label><input type="text" id="n${i}_fuenteEn" placeholder="Ej: breaker, UPS..."></div>
+          <div class="field"><label>¿Polo tierra?</label>
+            <select id="n${i}_polo"><option value="">Selecciona...</option><option value="sí">Sí</option><option value="no">No</option></select>
+          </div>
+        </div>
+        <div class="r3">
+          <div class="field"><label>Dist. fuente→caja (m)</label><input type="number" id="n${i}_distEn" min="0" placeholder="0" inputmode="numeric"></div>
+          <div class="field"><label>Calibre</label><input type="text" id="n${i}_calibre" placeholder="Ej: #12"></div>
+          <div class="field"><label>Tubería galv. (m)</label><input type="text" id="n${i}_tuberiaEn" placeholder="0"></div>
+        </div>
+        <div class="field"><label>Tablero de circuito</label><input type="text" id="n${i}_tablero" placeholder="Descripción del tablero"></div>
+      </div>
+`;
+    blocks.appendChild(b);
+  }
+}
+
+function addBuitronEquip(ti){
+  if(!buitronCount[ti]) buitronCount[ti]=0;
+  buitronCount[ti]++;
+  const idx=buitronCount[ti];
+  const c=document.getElementById('e'+ti+'_buitrones');
+  const d=document.createElement('div'); d.className='inner-card';
+  d.innerHTML=`
+    <div class="inner-card-title">Buitrón ${idx}</div>
+    <div class="r3">
+      <div class="field"><label>Piso ingreso</label><input type="number" id="n${ti}_b${idx}_piso" min="0" placeholder="0" inputmode="numeric"></div>
+      <div class="field"><label>Ocupación (%)</label><input type="number" id="n${ti}_b${idx}_ocup" min="0" max="100" placeholder="0" inputmode="numeric"></div>
+      <div class="field"><label>HHPP que distribuye</label><input type="number" id="n${ti}_b${idx}_hhpp" min="0" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div class="field"><label>Ubicación del ingreso</label><input type="text" id="n${ti}_b${idx}_ubic" placeholder="Descripción de la ubicación"></div>
+    <div class="field"><label>HHPP que alimenta en cada piso</label><input type="text" id="n${ti}_b${idx}_hhppPiso" placeholder="Ej: 4 HHPP por piso"></div>`;
+  c.appendChild(d);
+}
+
+function switchTab(section,idx){
+  document.querySelectorAll('#tabs'+section+' .t-tab').forEach((t,i)=>t.classList.toggle('active',i+1===idx));
+  document.querySelectorAll('#'+section.toLowerCase()+'Blocks .tower-block').forEach((b,i)=>b.classList.toggle('active',i+1===idx));
+}
+
+function buildReport(){
+  const b = t => '<strong>'+t+'</strong>';
+  const SEP = '\n<span style="color:#1D9E75;font-weight:500">──────────────────────────────────────</span>\n\n';
+  let r='';
+  r+=b('BUEN DÍA')+'\n';
+  r+='° '+b('NOMBRE DEL SITIO:')+' '+nd('nombre')+'\n';
+  r+='° '+b('CÓDIGO:')+' '+nd('codigo')+'\n';
+  r+='° '+b('HORA DE INGRESO:')+' '+nd('horaIngreso')+'\n';
+  r+='° '+b('HORA DE SALIDA:')+' '+nd('horaSalida')+'\n';
+  r+='° '+b('CANTIDAD DE TORRES VISITADAS:')+' '+nd('torresVisitadas')+'\n';
+  r+='° '+b('HOMES PASSED DEL SITE:')+' '+nd('homesPassed')+'\n';
+  r+='° '+b('ZONAS COMUNES VISITADAS:')+' '+nd('zonasVisitadas')+'\n';
+  r+='° '+b('ZONAS COMUNES VIABLES:')+' '+nd('zonasViables')+'\n';
+  r+='° '+b('DIAGNÓSTICO:')+' '+(diagVal||nd('diagnostico'))+'\n';
+  r+=b('** NOTAS:')+' '+nd('notas')+'\n\n';
+  r+=b('** DESCRIPCIÓN DEL SITIO.')+'\n';
+  r+='Se proyecta el despliegue con ('+nd('despliegue')+').\n';
+  r+='El sitio está compuesto por ('+numTorres+') torre(s), distribuidas de la siguiente manera:\n\n';
+
+  for(let i=1;i<=numTorres;i++){
+    if(i>1) r+=SEP;
+    r+=b('Torre '+i+':')+'\n';
+    r+='Piso '+nd('t'+i+'_terraza')+': terraza.\n';
+    const tc=tramoCount[i]||0;
+    for(let j=1;j<=tc;j++){
+      r+='De Piso '+nd('t'+i+'_r'+j+'_ini')+' a piso '+nd('t'+i+'_r'+j+'_fin')+' con '+nd('t'+i+'_r'+j+'_apts')+' apartamentos por piso, interiores '+nd('t'+i+'_r'+j+'_int')+'.\n';
+    }
+    r+='Cantidad de buitrones: '+nd('t'+i+'_buitrones')+'\n';
+    r+='Locales comerciales: '+nd('t'+i+'_locales')+'.\n';
+    r+='Pisos de sótanos: '+nd('t'+i+'_sotanos')+'.\n';
+    r+='La torre cuenta con un total de '+nd('t'+i+'_hhpp')+' HHPP.\n\n';
+
+    r+=b('EQUIPAMIENTO')+'\n';
+    r+='Gabinetes existentes desde el piso '+nd('e'+i+'_gabDesde')+' hasta el piso '+nd('e'+i+'_gabHasta')+'\n';
+    r+='Medidas de las cajas de piso: '+nd('e'+i+'_medCajas')+'\n';
+    r+='Distancia entre cajas de piso: '+nd('e'+i+'_distCajas')+'\n';
+    r+=b('GABINETE DE PISO:')+' Tiene una ocupación del '+nd('e'+i+'_ocupGab')+'% y los pisos sin espacio en los gabinetes serian '+nd('e'+i+'_pisosSin')+'.\n\n';
+
+    const cc=cajaCount[i]||0;
+    for(let j=1;j<=cc;j++){
+      const cajaTitulo = cc>1 ? 'CAJA DE EQUIPOS '+j+':' : 'CAJA DE EQUIPOS:';
+      r+=b(cajaTitulo)+' ubicada en piso '+nd('e'+i+'_c'+j+'_piso')+' en '+nd('e'+i+'_c'+j+'_ubic')+'.\n';
+      r+='Tamaño de la caja de equipos: '+nd('e'+i+'_c'+j+'_tam')+'.\n';
+      r+='Distancia de '+nd('e'+i+'_c'+j+'_distBuitron')+' MTRS hacia el ingreso al buitrón en piso '+nd('e'+i+'_c'+j+'_pisoBuitron')+'.\n';
+      r+='° hacia el gabinete de piso '+nd('e'+i+'_c'+j+'_pisoIniApts')+' donde inician los apartamentos '+nd('e'+i+'_c'+j+'_distGab')+' MTRS.\n';
+      r+='° se necesita '+nd('e'+i+'_c'+j+'_tuberia')+' MTRS de tubería galvanizada para la conexión desde la caja al gabinete donde inician los apartamentos.\n\n';
+    }
+
+    r+=b('ENERGÍA:')+' Ubicada en piso '+nd('n'+i+'_pisoEn')+' en '+nd('n'+i+'_ubicEn')+' saldríamos desde una '+nd('n'+i+'_fuenteEn')+' la cual '+nd('n'+i+'_polo')+' cuenta con polo tierra. La distancia desde la '+nd('n'+i+'_fuenteEn')+' a la caja es de '+nd('n'+i+'_distEn')+' MTRS en calibre numero '+nd('n'+i+'_calibre')+'.\n';
+    r+='° se necesitan '+nd('n'+i+'_tuberiaEn')+' MTRS de tubería galvanizada tablero de circuito de '+nd('n'+i+'_tablero')+'.\n\n';
+
+    const bc=buitronCount[i]||0;
+    for(let j=1;j<=bc;j++){
+      const buitTitulo = bc>1 ? 'BUITRÓN '+j+':' : 'BUITRÓN:';
+      r+=b(buitTitulo)+' Ingreso en piso '+nd('n'+i+'_b'+j+'_piso')+' ubicado en '+nd('n'+i+'_b'+j+'_ubic')+' con ocupación de '+nd('n'+i+'_b'+j+'_ocup')+'%. Distribuye '+nd('n'+i+'_b'+j+'_hhpp')+' HHPP.\n';
+      r+='HHPP que alimenta en cada piso: '+nd('n'+i+'_b'+j+'_hhppPiso')+'.\n\n';
+    }
+  }
+
+  r+=b('** ZONAS COMUNES:')+' '+nd('zonasComunes')+'\n\n';
+  r+=b('** INGRESO DE LA FIBRA:')+' '+nd('ingresoFibra')+'\n';
+
+  document.getElementById('outputBox').innerHTML=r;
+  sendToSheets();
+}
+
+async function sendToSheets(){
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz84Eo_nsfJjov3CGFNa-tKTbN2q2qrbHI98Eb2wYN0xzWuxCrxGxqEICAomEhM2FxSEQ/exec";
+  const payload = {
+    nombre: nd('nombre'), codigo: nd('codigo'),
+    horaIngreso: nd('horaIngreso'), horaSalida: nd('horaSalida'),
+    torresVisitadas: nd('torresVisitadas'), homesPassed: nd('homesPassed'),
+    zonasVisitadas: nd('zonasVisitadas'), zonasViables: nd('zonasViables'),
+    diagnostico: diagVal||nd('diagnostico'),
+    notas: nd('notas'), despliegue: nd('despliegue'), numTorres: numTorres,
+    zonasComunes: nd('zonasComunes'), ingresoFibra: nd('ingresoFibra')
+  };
+  for(let i=1;i<=6;i++){
+    payload['t'+i+'_terraza']   = nd('t'+i+'_terraza');
+    payload['t'+i+'_buitrones'] = nd('t'+i+'_buitrones');
+    payload['t'+i+'_locales']   = nd('t'+i+'_locales');
+    payload['t'+i+'_sotanos']   = nd('t'+i+'_sotanos');
+    payload['t'+i+'_hhpp']      = nd('t'+i+'_hhpp');
+    payload['t'+i+'_gabDesde']  = nd('e'+i+'_gabDesde');
+    payload['t'+i+'_gabHasta']  = nd('e'+i+'_gabHasta');
+    payload['t'+i+'_medCajas']  = nd('e'+i+'_medCajas');
+    payload['t'+i+'_distCajas'] = nd('e'+i+'_distCajas');
+    payload['t'+i+'_ocupGab']   = nd('e'+i+'_ocupGab');
+    payload['t'+i+'_pisosSin']  = nd('e'+i+'_pisosSin');
+    payload['t'+i+'_pisoEn']    = nd('n'+i+'_pisoEn');
+    payload['t'+i+'_ubicEn']    = nd('n'+i+'_ubicEn');
+    payload['t'+i+'_fuenteEn']  = nd('n'+i+'_fuenteEn');
+    payload['t'+i+'_polo']      = nd('n'+i+'_polo');
+    payload['t'+i+'_distEn']    = nd('n'+i+'_distEn');
+    payload['t'+i+'_calibre']   = nd('n'+i+'_calibre');
+    payload['t'+i+'_tuberia']   = nd('n'+i+'_tuberiaEn');
+    payload['t'+i+'_tablero']   = nd('n'+i+'_tablero');
+    const tc=tramoCount[i]||0;
+    for(let j=1;j<=5;j++){
+      payload['t'+i+'_r'+j+'_ini']  = j<=tc?nd('t'+i+'_r'+j+'_ini'):'';
+      payload['t'+i+'_r'+j+'_fin']  = j<=tc?nd('t'+i+'_r'+j+'_fin'):'';
+      payload['t'+i+'_r'+j+'_apts'] = j<=tc?nd('t'+i+'_r'+j+'_apts'):'';
+      payload['t'+i+'_r'+j+'_int']  = j<=tc?nd('t'+i+'_r'+j+'_int'):'';
+    }
+    const cc=cajaCount[i]||0;
+    for(let j=1;j<=3;j++){
+      payload['t'+i+'_c'+j+'_piso']        = j<=cc?nd('e'+i+'_c'+j+'_piso'):'';
+      payload['t'+i+'_c'+j+'_ubic']        = j<=cc?nd('e'+i+'_c'+j+'_ubic'):'';
+      payload['t'+i+'_c'+j+'_tam']         = j<=cc?nd('e'+i+'_c'+j+'_tam'):'';
+      payload['t'+i+'_c'+j+'_distBuitron'] = j<=cc?nd('e'+i+'_c'+j+'_distBuitron'):'';
+      payload['t'+i+'_c'+j+'_pisoBuitron'] = j<=cc?nd('e'+i+'_c'+j+'_pisoBuitron'):'';
+      payload['t'+i+'_c'+j+'_distGab']     = j<=cc?nd('e'+i+'_c'+j+'_distGab'):'';
+      payload['t'+i+'_c'+j+'_pisoIniApts'] = j<=cc?nd('e'+i+'_c'+j+'_pisoIniApts'):'';
+      payload['t'+i+'_c'+j+'_tuberia']     = j<=cc?nd('e'+i+'_c'+j+'_tuberia'):'';
+    }
+    const bc=buitronCount[i]||0;
+    for(let j=1;j<=5;j++){
+      payload['t'+i+'_b'+j+'_piso']     = j<=bc?nd('n'+i+'_b'+j+'_piso'):'';
+      payload['t'+i+'_b'+j+'_ocup']     = j<=bc?nd('n'+i+'_b'+j+'_ocup'):'';
+      payload['t'+i+'_b'+j+'_hhpp']     = j<=bc?nd('n'+i+'_b'+j+'_hhpp'):'';
+      payload['t'+i+'_b'+j+'_hhppPiso'] = j<=bc?nd('n'+i+'_b'+j+'_hhppPiso'):'';
+      payload['t'+i+'_b'+j+'_ubic']     = j<=bc?nd('n'+i+'_b'+j+'_ubic'):'';
+    }
+  }
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    showSheetToast('Guardado en Google Sheets');
+  } catch(err) {
+    showSheetToast('No se pudo guardar en Sheets');
+  }
+}
+function showSheetToast(msg){
+  let toast = document.getElementById('sheetToast');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id = 'sheetToast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1A18;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-family:DM Sans,sans-serif;z-index:999;opacity:0;transition:opacity 0.3s;white-space:nowrap;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  setTimeout(()=>{ toast.style.opacity='0'; }, 3500);
+}
+
+function copyReport(){
+  // Obtener texto plano sin etiquetas HTML para copiar/WhatsApp
+  const box = document.getElementById('outputBox');
+  const text = box.innerText || box.textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('btnCopy');
+    btn.innerHTML='<i class="ti ti-check"></i> ¡Copiado!';
+    setTimeout(()=>{ btn.innerHTML='<i class="ti ti-copy"></i> Copiar'; },2500);
+  });
+}
+
+function shareWhatsApp(){
+  const box = document.getElementById('outputBox');
+  const text = box.innerText || box.textContent;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+function resetAll(){
+  document.querySelectorAll('input, textarea, select').forEach(e=>e.value='');
+  document.querySelectorAll('.diag-pill').forEach(p=>p.classList.remove('selected'));
+  diagVal='';
+  document.getElementById('torreBloques').innerHTML='';
+  document.getElementById('tabsEquip').innerHTML='';
+  document.getElementById('equipBlocks').innerHTML='';
+  document.getElementById('tabsEnergia').innerHTML='';
+  document.getElementById('energiaBlocks').innerHTML='';
+  tramoCount={}; cajaCount={}; buitronCount={};
+  numTorres=0;
+  goTo(1);
+}
+</script>
+</body>
+</html>
