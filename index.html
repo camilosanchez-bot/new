@@ -430,8 +430,8 @@ function buildReport(){
   r+='° '+b('DIAGNÓSTICO:')+' '+(diagVal||nd('diagnostico'))+'\n';
   r+=b('** NOTAS:')+' '+nd('notas')+'\n\n';
   r+=b('** DESCRIPCIÓN DEL SITIO.')+'\n';
-  r+='Se proyecta el despliegue con ('+nd('despliegue')+').\n';
-  r+='El sitio está compuesto por ('+numTorres+') torre(s), distribuidas de la siguiente manera:\n\n';
+  r+='Se proyecta el despliegue con '+nd('despliegue')+'.\n';
+  r+='El sitio está compuesto por '+numTorres+' torre(s), distribuidas de la siguiente manera:\n\n';
 
   for(let i=1;i<=numTorres;i++){
     if(i>1) r+=SEP;
