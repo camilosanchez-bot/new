@@ -450,7 +450,8 @@ function buildReport(){
     r+='Gabinetes existentes desde el piso '+nd('e'+i+'_gabDesde')+' hasta el piso '+nd('e'+i+'_gabHasta')+'\n';
     r+='Medidas de las cajas de piso: '+nd('e'+i+'_medCajas')+'\n';
     r+='Distancia entre cajas de piso: '+nd('e'+i+'_distCajas')+'\n';
-    r+=b('GABINETE DE PISO:')+' Tiene una ocupación del '+nd('e'+i+'_ocupGab')+'% y los pisos sin espacio en los gabinetes serian '+nd('e'+i+'_pisosSin')+'.\n\n';
+    const pisosSin = nd('e'+i+'_pisosSin');
+    r+=b('GABINETE DE PISO:')+' Tiene una ocupación del '+nd('e'+i+'_ocupGab')+'% '+(pisosSin==='N/D' ? 'y los SW/Terminales caben en todos los pisos.' : 'y los pisos sin espacio en los gabinetes serian '+pisosSin+'.')+'\n\n';
 
     const cc=cajaCount[i]||0;
     for(let j=1;j<=cc;j++){
@@ -462,8 +463,8 @@ function buildReport(){
       r+='° se necesita '+nd('e'+i+'_c'+j+'_tuberia')+' MTRS de tubería galvanizada para la conexión desde la caja al gabinete donde inician los apartamentos.\n\n';
     }
 
-    r+=b('ENERGÍA:')+' Ubicada en piso '+nd('n'+i+'_pisoEn')+' en '+nd('n'+i+'_ubicEn')+' saldríamos desde una '+nd('n'+i+'_fuenteEn')+' la cual '+nd('n'+i+'_polo')+' cuenta con polo tierra. La distancia desde la '+nd('n'+i+'_fuenteEn')+' a la caja es de '+nd('n'+i+'_distEn')+' MTRS en calibre numero '+nd('n'+i+'_calibre')+'.\n';
-    r+='° se necesitan '+nd('n'+i+'_tuberiaEn')+' MTRS de tubería galvanizada tablero de circuito de '+nd('n'+i+'_tablero')+'.\n\n';
+    r+=b('ENERGÍA:')+' Ubicada en piso '+nd('n'+i+'_pisoEn')+' en '+nd('n'+i+'_ubicEn')+' saldríamos desde un '+nd('n'+i+'_fuenteEn')+' el cual '+nd('n'+i+'_polo')+' cuenta con polo tierra. La distancia desde el '+nd('n'+i+'_fuenteEn')+' a la caja es de '+nd('n'+i+'_distEn')+' MTRS en calibre numero '+nd('n'+i+'_calibre')+'.\n';
+    r+='Se necesitan '+nd('n'+i+'_tuberiaEn')+' metros de tuberia desde '+nd('n'+i+'_fuenteEn')+' hasta la caja de equipos.\n\n';
 
     const bc=buitronCount[i]||0;
     for(let j=1;j<=bc;j++){
