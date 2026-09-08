@@ -343,15 +343,7 @@ function addCaja(ti){
     <div class="field"><label>Piso</label><input type="number" id="e${ti}_c${idx}_piso" min="0" placeholder="0" inputmode="numeric"></div>
     <div class="field"><label>Tamaño de la caja de equipos</label><input type="text" id="e${ti}_c${idx}_tam" placeholder="Ej: 60x40x20 cm"></div>
     <div class="field"><label>Ubicación exacta</label><input type="text" id="e${ti}_c${idx}_ubic" placeholder="Ej: cuarto de redes, pasillo..."></div>
-    <div class="r3">
-      <div class="field"><label>Dist. buitrón (m)</label><input type="number" id="e${ti}_c${idx}_distBuitron" min="0" placeholder="0" inputmode="numeric"></div>
-      <div class="field"><label>Piso buitrón</label><input type="number" id="e${ti}_c${idx}_pisoBuitron" min="0" placeholder="0" inputmode="numeric"></div>
-      <div class="field"><label>Dist. gabinete (m)</label><input type="number" id="e${ti}_c${idx}_distGab" min="0" placeholder="0" inputmode="numeric"></div>
-    </div>
-    <div class="r2">
-      <div class="field"><label>Piso inicio apts.</label><input type="number" id="e${ti}_c${idx}_pisoIniApts" min="0" placeholder="0" inputmode="numeric"></div>
-      <div class="field"><label>Tubería galv. (m)</label><input type="text" id="e${ti}_c${idx}_tuberia" placeholder="0"></div>
-    </div>`;
+`;
   c.appendChild(d);
 }
 
@@ -404,6 +396,8 @@ function addBuitronEquip(ti){
       <div class="field"><label>Ocupación (%)</label><input type="number" id="n${ti}_b${idx}_ocup" min="0" max="100" placeholder="0" inputmode="numeric"></div>
       <div class="field"><label>HHPP que distribuye</label><input type="number" id="n${ti}_b${idx}_hhpp" min="0" placeholder="0" inputmode="numeric"></div>
     </div>
+    <div class="field"><label>Distancia hasta el primer gabinete de piso (m)</label><input type="number" id="n${ti}_b${idx}_distGab" min="0" placeholder="0" inputmode="numeric"></div>
+    <div class="field"><label>Tubería galv. (m)</label><input type="text" id="n${ti}_b${idx}_tuberia" placeholder="0"></div>
     <div class="field"><label>Ubicación del ingreso</label><input type="text" id="n${ti}_b${idx}_ubic" placeholder="Descripción de la ubicación"></div>
     <div class="field"><label>HHPP que alimenta en cada piso</label><input type="text" id="n${ti}_b${idx}_hhppPiso" placeholder="Ej: 4 HHPP por piso"></div>`;
   c.appendChild(d);
@@ -418,7 +412,7 @@ function buildReport(){
   const b = t => '<strong>'+t+'</strong>';
   const SEP = '\n<span style="color:#1D9E75;font-weight:500">──────────────────────────────────────</span>\n\n';
   let r='';
-  r+=b('BUEN DÍA')+'\n';
+  r+=b('BUENAS TARDES')+'\n';
   r+='° '+b('NOMBRE DEL SITIO:')+' '+nd('nombre')+'\n';
   r+='° '+b('CÓDIGO:')+' '+nd('codigo')+'\n';
   r+='° '+b('HORA DE INGRESO:')+' '+nd('horaIngreso')+'\n';
@@ -430,8 +424,8 @@ function buildReport(){
   r+='° '+b('DIAGNÓSTICO:')+' '+(diagVal||nd('diagnostico'))+'\n';
   r+=b('** NOTAS:')+' '+nd('notas')+'\n\n';
   r+=b('** DESCRIPCIÓN DEL SITIO.')+'\n';
-  r+='Se proyecta el despliegue con '+nd('despliegue')+'.\n';
-  r+='El sitio está compuesto por '+numTorres+' torre(s), distribuidas de la siguiente manera:\n\n';
+  r+='Se proyecta el despliegue con ('+nd('despliegue')+').\n';
+  r+='El sitio está compuesto por ('+numTorres+') torre(s), distribuidas de la siguiente manera:\n\n';
 
   for(let i=1;i<=numTorres;i++){
     if(i>1) r+=SEP;
@@ -456,11 +450,11 @@ function buildReport(){
     const cc=cajaCount[i]||0;
     for(let j=1;j<=cc;j++){
       const cajaTitulo = cc>1 ? 'CAJA DE EQUIPOS '+j+':' : 'CAJA DE EQUIPOS:';
-      r+=b(cajaTitulo)+' ubicada en piso '+nd('e'+i+'_c'+j+'_piso')+' en '+nd('e'+i+'_c'+j+'_ubic')+'.\n';
-      r+='Tamaño de la caja de equipos: '+nd('e'+i+'_c'+j+'_tam')+'.\n';
-      r+='Distancia de '+nd('e'+i+'_c'+j+'_distBuitron')+' MTRS hacia el ingreso al buitrón en piso '+nd('e'+i+'_c'+j+'_pisoBuitron')+'.\n';
-      r+='° hacia el gabinete de piso '+nd('e'+i+'_c'+j+'_pisoIniApts')+' donde inician los apartamentos '+nd('e'+i+'_c'+j+'_distGab')+' MTRS.\n';
-      r+='° se necesita '+nd('e'+i+'_c'+j+'_tuberia')+' MTRS de tubería galvanizada para la conexión desde la caja al gabinete donde inician los apartamentos.\n\n';
+      r+=b(cajaTitulo)+'\n';
+      r+='- Ubicada en piso '+nd('e'+i+'_c'+j+'_piso')+' en '+nd('e'+i+'_c'+j+'_ubic')+'.\n';
+      r+='- Tamaño de la caja de equipos: '+nd('e'+i+'_c'+j+'_tam')+'.\n';
+      r+='- Distancia hasta el primer gabinete de piso: '+nd('n'+i+'_b'+j+'_distGab')+' MTRS.\n';
+      r+='- Se necesita '+nd('n'+i+'_b'+j+'_tuberia')+' MTRS de tubería galvanizada para la conexión desde la caja al gabinete donde inician los apartamentos.\n\n';
     }
 
     r+=b('ENERGÍA:')+' Ubicada en piso '+nd('n'+i+'_pisoEn')+' en '+nd('n'+i+'_ubicEn')+' saldríamos desde un '+nd('n'+i+'_fuenteEn')+' el cual '+nd('n'+i+'_polo')+' cuenta con polo tierra. La distancia desde el '+nd('n'+i+'_fuenteEn')+' a la caja es de '+nd('n'+i+'_distEn')+' MTRS en calibre numero '+nd('n'+i+'_calibre')+'.\n';
@@ -469,8 +463,11 @@ function buildReport(){
     const bc=buitronCount[i]||0;
     for(let j=1;j<=bc;j++){
       const buitTitulo = bc>1 ? 'BUITRÓN '+j+':' : 'BUITRÓN:';
-      r+=b(buitTitulo)+' Ingreso en piso '+nd('n'+i+'_b'+j+'_piso')+' ubicado en '+nd('n'+i+'_b'+j+'_ubic')+' con ocupación de '+nd('n'+i+'_b'+j+'_ocup')+'%. Distribuye '+nd('n'+i+'_b'+j+'_hhpp')+' HHPP.\n';
-      r+='HHPP que alimenta en cada piso: '+nd('n'+i+'_b'+j+'_hhppPiso')+'.\n\n';
+      r+=b(buitTitulo)+'\n';
+      r+='- Ingreso en piso '+nd('n'+i+'_b'+j+'_piso')+' ubicado en '+nd('n'+i+'_b'+j+'_ubic')+' con ocupación de '+nd('n'+i+'_b'+j+'_ocup')+'%. Distribuye '+nd('n'+i+'_b'+j+'_hhpp')+' HHPP.\n';
+      r+='- Distancia hasta el gabinete: '+nd('n'+i+'_b'+j+'_distGab')+' MTRS.\n';
+      r+='- HHPP que alimenta en cada piso: '+nd('n'+i+'_b'+j+'_hhppPiso')+'.\n';
+      r+='- Tubería galvanizada: '+nd('n'+i+'_b'+j+'_tuberia')+' MTRS.\n\n';
     }
   }
 
@@ -524,17 +521,14 @@ async function sendToSheets(){
       payload['t'+i+'_c'+j+'_piso']        = j<=cc?nd('e'+i+'_c'+j+'_piso'):'';
       payload['t'+i+'_c'+j+'_ubic']        = j<=cc?nd('e'+i+'_c'+j+'_ubic'):'';
       payload['t'+i+'_c'+j+'_tam']         = j<=cc?nd('e'+i+'_c'+j+'_tam'):'';
-      payload['t'+i+'_c'+j+'_distBuitron'] = j<=cc?nd('e'+i+'_c'+j+'_distBuitron'):'';
-      payload['t'+i+'_c'+j+'_pisoBuitron'] = j<=cc?nd('e'+i+'_c'+j+'_pisoBuitron'):'';
-      payload['t'+i+'_c'+j+'_distGab']     = j<=cc?nd('e'+i+'_c'+j+'_distGab'):'';
-      payload['t'+i+'_c'+j+'_pisoIniApts'] = j<=cc?nd('e'+i+'_c'+j+'_pisoIniApts'):'';
-      payload['t'+i+'_c'+j+'_tuberia']     = j<=cc?nd('e'+i+'_c'+j+'_tuberia'):'';
     }
     const bc=buitronCount[i]||0;
     for(let j=1;j<=5;j++){
       payload['t'+i+'_b'+j+'_piso']     = j<=bc?nd('n'+i+'_b'+j+'_piso'):'';
       payload['t'+i+'_b'+j+'_ocup']     = j<=bc?nd('n'+i+'_b'+j+'_ocup'):'';
       payload['t'+i+'_b'+j+'_hhpp']     = j<=bc?nd('n'+i+'_b'+j+'_hhpp'):'';
+      payload['t'+i+'_b'+j+'_distGab']  = j<=bc?nd('n'+i+'_b'+j+'_distGab'):'';
+      payload['t'+i+'_b'+j+'_tuberia']  = j<=bc?nd('n'+i+'_b'+j+'_tuberia'):'';
       payload['t'+i+'_b'+j+'_hhppPiso'] = j<=bc?nd('n'+i+'_b'+j+'_hhppPiso'):'';
       payload['t'+i+'_b'+j+'_ubic']     = j<=bc?nd('n'+i+'_b'+j+'_ubic'):'';
     }
