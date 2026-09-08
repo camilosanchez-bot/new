@@ -424,8 +424,8 @@ function buildReport(){
   r+='° '+b('DIAGNÓSTICO:')+' '+(diagVal||nd('diagnostico'))+'\n';
   r+=b('** NOTAS:')+' '+nd('notas')+'\n\n';
   r+=b('** DESCRIPCIÓN DEL SITIO.')+'\n';
-  r+='Se proyecta el despliegue con ('+nd('despliegue')+').\n';
-  r+='El sitio está compuesto por ('+numTorres+') torre(s), distribuidas de la siguiente manera:\n\n';
+  r+='Se proyecta el despliegue con '+nd('despliegue')+'.\n';
+  r+='El sitio está compuesto por '+numTorres+' torre(s), distribuidas de la siguiente manera:\n\n';
 
   for(let i=1;i<=numTorres;i++){
     if(i>1) r+=SEP;
@@ -457,7 +457,8 @@ function buildReport(){
       r+='- Se necesita '+nd('n'+i+'_b'+j+'_tuberia')+' MTRS de tubería galvanizada para la conexión desde la caja al gabinete donde inician los apartamentos.\n\n';
     }
 
-    r+=b('ENERGÍA:')+' Ubicada en piso '+nd('n'+i+'_pisoEn')+' en '+nd('n'+i+'_ubicEn')+' saldríamos desde un '+nd('n'+i+'_fuenteEn')+' el cual '+nd('n'+i+'_polo')+' cuenta con polo tierra. La distancia desde el '+nd('n'+i+'_fuenteEn')+' a la caja es de '+nd('n'+i+'_distEn')+' MTRS en calibre numero '+nd('n'+i+'_calibre')+'.\n';
+    r+=b('ENERGÍA:')+'\n';
+    r+='Ubicada en piso '+nd('n'+i+'_pisoEn')+' en '+nd('n'+i+'_ubicEn')+' saldríamos desde un '+nd('n'+i+'_fuenteEn')+' el cual '+nd('n'+i+'_polo')+' cuenta con polo tierra. La distancia desde el '+nd('n'+i+'_fuenteEn')+' a la caja es de '+nd('n'+i+'_distEn')+' MTRS en calibre numero '+nd('n'+i+'_calibre')+'.\n';
     r+='Se necesitan '+nd('n'+i+'_tuberiaEn')+' metros de tuberia desde '+nd('n'+i+'_fuenteEn')+' hasta la caja de equipos.\n\n';
 
     const bc=buitronCount[i]||0;
